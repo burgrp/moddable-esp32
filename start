@@ -1,0 +1,39 @@
+#!/bin/bash
+
+set -e
+
+CONTAINER=test
+TARGET_DIR=/home/paul/tmp/m
+
+executables() {
+    find ${MODDABLE}/build/bin/lin/release -type f -executable
+}
+
+    for FILE in $(executables)
+    do
+        echo Installing $(basename $FILE)
+        TARGET=$TARGET_DIR/$(basename $FILE)
+        cat >$TARGET <<EOF
+#!/bin/sh
+set -e
+podman exec -it --workdir=\$PWD $CONTAINER $FILE \$@
+#--user=\$USER
+EOF
+    chmod 770 $TARGET
+    done    
+
+
+uninstall() {
+    for FILE in $(executables)
+    do
+        echo Uninstalling $(basename $FILE)
+        TARGET=$TARGET_DIR/$(basename $FILE)
+        rm $TARGET
+    done    
+}
+
+useradd $USER
+
+trap uninstall SIGINT
+bash
+uninstall
