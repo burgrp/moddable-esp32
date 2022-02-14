@@ -2,8 +2,14 @@
 
 set -e
 
-CONTAINER=test
-TARGET_DIR=/home/paul/tmp/m
+CONTAINER=moddable-sdk
+TARGET_DIR=$1
+
+if [ -z $TARGET_DIR ]
+then
+    echo "use: start <target-dir>"
+    exit 1
+fi
 
 executables() {
     find ${MODDABLE}/build/bin/lin/release -type f -executable
@@ -17,7 +23,6 @@ executables() {
 #!/bin/sh
 set -e
 podman exec -it --workdir=\$PWD $CONTAINER $FILE \$@
-#--user=\$USER
 EOF
     chmod 770 $TARGET
     done    
@@ -31,8 +36,6 @@ uninstall() {
         rm $TARGET
     done    
 }
-
-useradd $USER
 
 trap uninstall SIGINT
 bash
