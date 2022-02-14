@@ -2,6 +2,7 @@ ARG UBUNTU_VERSION=20.04
 ARG MODDABLE_VERSION=OS210826
 ARG ESP8266_RTOS_SDK_VERSION=v3.2
 ARG ESP8266_ARDUINO_SDK_VERSION=2.3.0
+ARG IDF_VERSION=v4.3.2
 
 FROM ubuntu:${UBUNTU_VERSION}
 
@@ -46,6 +47,19 @@ RUN rm ~arduino-sdk.zip
 
 ARG ESP8266_RTOS_SDK_VERSION
 RUN git clone -c advice.detachedHead=false --depth 1 -b $ESP8266_RTOS_SDK_VERSION  https://github.com/espressif/ESP8266_RTOS_SDK.git
+
+########## ESP32 ##########
+
+WORKDIR /root/esp32
+ARG IDF_VERSION
+RUN git clone -b $IDF_VERSION --recursive https://github.com/espressif/esp-idf.git
+
+WORKDIR /root/esp32/esp-idf
+RUN git submodule update --init --recursive
+
+
+
+########## and the rest ##########
 
 WORKDIR /root
 COPY start /usr/bin 
